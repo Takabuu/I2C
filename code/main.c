@@ -37,39 +37,86 @@ bool isValidMove(char board[SIZE][SIZE], int row, int col) {
 void updateBoard(char board[SIZE][SIZE], int row, int col, char player) {
     board[row][col] = player;
 }
-
+// 6. Check win condition
+bool checkWin(char board[SIZE][SIZE], char player) {
+    for (int i = 0; i < SIZE; i++) {
+        if (board[i][0] == player && board[i][1] == player && board[i][2] == player) return true;
+    }
+    for (int j = 0; j < SIZE; j++) {
+        if (board[0][j] == player && board[1][j] == player && board[2][j] == player) return true;
+    }
+    if (board[0][0] == player && board[1][1] == player && board[2][2] == player) return true;
+    if (board[0][2] == player && board[1][1] == player && board[2][0] == player) return true;
+    return false;
+}
+// 7. Check draw condition
+bool isBoardFull(char board[SIZE][SIZE]) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (board[i][j] == ' ') return false;
+        }
+    }
+    return true;
+}
+// 8. Switch player
+char switchPlayer(char activePlayer) {
+    return (activePlayer == 'X') ? 'O' : 'X';
+}
 int main() {
     char board[SIZE][SIZE];
     char activePlayer = 'X';
     int row, col;
     bool validMove = false;
-
-    // 1. Program start + 2. Board initialization
-    initializeBoard(board);
-
-    // 3. Display game state
-    displayBoard(board);
-
-    // 4. Player input (loop until valid)
-    do {
-        printf("Player %c, enter row and column (1-3): ", activePlayer);
-        scanf("%d %d", &row, &col);
-
-        row--;
-        col--;
-
-        validMove = isValidMove(board, row, col);
-
-        if (!validMove) {
-            printf("Invalid move. Try again.\n");
+    bool gameOver = false;
+    char winner = ' ';
+    char playAgain = 'y';
+    // 10. Replay loop
+    while (playAgain == 'y' || playAgain == 'Y') {
+        // 1. Program start + 2. Board initialization
+        initializeBoard(board);
+        activePlayer = 'X';
+        gameOver = false;
+        winner = ' ';
+        while (!gameOver) {
+            // 3. Display game state
+            displayBoard(board);
+            // 4. Player input (loop until valid)
+            do {
+                printf("Player %c, enter row and column (1-3): ", activePlayer);
+                scanf("%d %d", &row, &col);
+                row--;
+                col--;
+                validMove = isValidMove(board, row, col);
+                if (!validMove) {
+                    printf("Invalid move. Try again.\n");
+                }
+            } while (!validMove);
+            // 5. Update board
+            updateBoard(board, row, col, activePlayer);
+            // 6. Check win condition
+            if (checkWin(board, activePlayer)) {
+                gameOver = true;
+                winner = activePlayer;
+            }
+            // 7. Check draw condition
+            else if (isBoardFull(board)) {
+                gameOver = true;
+            }
+            // 8. Switch player
+            else {
+                activePlayer = switchPlayer(activePlayer);
+            }
         }
-
-    } while (!validMove);
-
-    // 5. Update board
-    updateBoard(board, row, col, activePlayer);
-
-    displayBoard(board);
-
+        // 9. End of round
+        displayBoard(board);
+        if (winner != ' ') {
+            printf("Player %c wins!\n", winner);
+        } else {
+            printf("It's a draw!\n");
+        }
+        // 10. Replay option
+        printf("Play again? (y/n): ");
+        scanf(" %c", &playAgain);
+    }
     return 0;
 }
