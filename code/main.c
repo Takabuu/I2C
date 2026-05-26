@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdbool.h>
 
 #define SIZE 3
@@ -9,6 +10,16 @@ void initializeBoard(char board[SIZE][SIZE]) {
             board[i][j] = ' ';
         }
     }
+}
+
+bool readMove(int *row, int *col) {
+    char input[100];
+
+    if (fgets(input, sizeof(input), stdin) == NULL) {
+        return false;
+    }
+
+    return sscanf(input, "%d %d", row, col) == 2;
 }
 
 void displayBoard(char board[SIZE][SIZE]) {
@@ -70,6 +81,7 @@ int main() {
     bool gameOver = false;
     char winner = ' ';
     char playAgain = 'y';
+    char inputPlayAgain[10];
     // 10. Replay loop
     while (playAgain == 'y' || playAgain == 'Y') {
         // 1. Program start + 2. Board initialization
@@ -82,8 +94,14 @@ int main() {
             displayBoard(board);
             // 4. Player input (loop until valid)
             do {
+                // inputvalidtaion
                 printf("Player %c, enter row and column (1-3): ", activePlayer);
-                scanf("%d %d", &row, &col);
+                if (!readMove(&row, &col)) {
+                    printf("Invalid input. Please enter numbers only.\n");
+                    validMove = false;
+                    continue;
+                }
+
                 row--;
                 col--;
                 validMove = isValidMove(board, row, col);
@@ -115,8 +133,29 @@ int main() {
             printf("It's a draw!\n");
         }
         // 10. Replay option
-        printf("Play again? (y/n): ");
-        scanf(" %c", &playAgain);
+        do {
+            printf("Play again? (y/n): ");
+
+            if (fgets(inputPlayAgain, sizeof(inputPlayAgain), stdin) == NULL) {
+                return 1;
+            }
+
+             // Clear remaining input if line was too long
+            if (inputPlayAgain[strlen(inputPlayAgain) - 1] != '\n') {
+                int ch;
+                while ((ch = getchar()) != '\n' && ch != EOF);
+            }
+
+            playAgain = inputPlayAgain[0];
+
+            if (playAgain != 'y' && playAgain != 'Y' &&
+                playAgain != 'n' && playAgain != 'N') {
+                printf("Invalid input. Please enter y or n.\n");
+            }
+
+        } while (playAgain != 'y' && playAgain != 'Y' &&
+                playAgain != 'n' && playAgain != 'N');
+
     }
     return 0;
 }
