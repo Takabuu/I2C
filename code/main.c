@@ -95,7 +95,7 @@ int main() {
             // 4. Player input (loop until valid)
             do {
                 // inputvalidtaion
-                printf("Player %c, enter row and column (1-3): ", activePlayer);
+                printf("Player %c, enter row and column (1-3, separated by a space): ", activePlayer);
                 if (!readMove(&row, &col)) {
                     printf("Invalid input. Please enter numbers only.\n");
                     validMove = false;
